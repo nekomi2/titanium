@@ -104,5 +104,6 @@
     outline: none;
     font-size: 0.8rem;
     height: 2rem;
+    color: white;
   }
 </style>

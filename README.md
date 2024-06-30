@@ -6,7 +6,6 @@ Inspired by cobalt.tools
 ## TODO
 - [ ] Rate limit
 - [ ] Add progress bar
-- [ ] Fix black text
 - [ ] Send notification PWA
 - [ ] Add video upload
 - [ ] Fix video CSS
