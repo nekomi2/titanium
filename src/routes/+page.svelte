@@ -1,7 +1,7 @@
 <script lang="ts">
   import { FFmpeg } from "@ffmpeg/ffmpeg";
   import { onMount } from "svelte";
-  import { fetchFile, checkVideoURL } from "$lib/utils";
+  import { fetchFile, checkVideoURL, getFormat } from "$lib/utils";
   let inputValue = "";
   let isValidVideoURL = false;
   let state: "loading" | "loaded" | "processing" | "done" | "error" = "loading";
@@ -17,7 +17,8 @@
   async function convertToMp4(url: string) {
     try {
       state = "processing";
-      const inputFileName = "input.webm";
+      const format = getFormat(url);
+      const inputFileName = `input.${format}`;
       const outputFileName = "output.mp4";
 
       // Fetch the file and write it to FFmpeg's file system
@@ -34,7 +35,7 @@
 
       state = "done";
     } catch (error) {
-      console.error("Error converting video, probably blocked by CORS.");
+      console.error("Error converting video");
       console.error(error);
       state = "error";
     }

@@ -8,6 +8,13 @@ export async function fetchFile(url: string) {
     const data = await response.arrayBuffer();
     return new Uint8Array(data);
   }
+
+const formats = ['webm', 'avi', 'gif', 'mov']
+
 export function checkVideoURL(url: string): boolean {
-    return url.toLowerCase().endsWith(".webm");
+    return formats.some(format => url.toLowerCase().endsWith(format));
   }
+
+export function getFormat(url: string): string {
+    return formats.find(format => url.toLowerCase().endsWith(format)) || '';
+}
