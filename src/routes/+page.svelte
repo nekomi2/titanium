@@ -1,22 +1,19 @@
 <script lang="ts">
   import { FFmpeg } from "@ffmpeg/ffmpeg";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
+  import { fetchFile, checkVideoURL } from "$lib/utils";
   let inputValue = "";
-  let isValidWebm = false;
+  let isValidVideoURL = false;
   let state: "loading" | "loaded" | "processing" | "done" | "error" = "loading";
   let ffmpeg: FFmpeg;
   let outputUrl: string;
-  async function handleKeyDown(event: KeyboardEvent) {
-    isValidWebm = checkIfWebm(inputValue);
-    if (isValidWebm) {
+  async function handleInput(event: any) {
+    isValidVideoURL = checkVideoURL(inputValue);
+    if (isValidVideoURL) {
       await convertToMp4(inputValue);
     }
   }
-  async function fetchFile(url: string) {
-    const response = await fetch(url);
-    const data = await response.arrayBuffer();
-    return new Uint8Array(data);
-  }
+
   async function convertToMp4(url: string) {
     try {
       state = "processing";
@@ -37,23 +34,28 @@
 
       state = "done";
     } catch (error) {
-      console.error("Error converting video:", error);
+      console.error("Error converting video, probably blocked by CORS.");
+      console.error(error);
       state = "error";
     }
   }
+
   async function loadFFmpeg() {
     const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm";
     ffmpeg = new FFmpeg();
+    ffmpeg.on("log", ({ message }) => {
+      console.log(message);
+    });
+
     await ffmpeg.load({
       coreURL: `${baseURL}/ffmpeg-core.js`,
       wasmURL: `${baseURL}/ffmpeg-core.wasm`,
+      workerURL: `${baseURL}/ffmpeg-core.worker.js`,
     });
     state = "loaded";
     console.log("FFmpeg loaded");
   }
-  function checkIfWebm(url: string): boolean {
-    return url.toLowerCase().endsWith(".webm");
-  }
+
   onMount(async () => {
     await loadFFmpeg();
   });
@@ -61,14 +63,20 @@
 
 <div class="mainbox">
   <h1>Titanium</h1>
-  <h2>Convert WebM to MP4 in your browser</h2>
+  <h2>Transcode videos in your browser</h2>
   <input
     class="url-input"
     type="text"
     placeholder="Insert video link"
     bind:value={inputValue}
-    on:keydown={handleKeyDown}
+    on:input={handleInput}
   />
+
+  {#if !isValidVideoURL}
+    <p>Not a valid video URL.</p>
+  {:else}
+    <p>Valid video URL.</p>
+  {/if}
   {#if state === "processing"}
     <p>Converting video...</p>
   {:else if state === "done"}
@@ -77,9 +85,7 @@
       <track kind="captions" />
     </video>
   {:else if state === "error"}
-    <p>Error converting video. Please try again.</p>
-  {:else}
-    <p>Not a valid WebM URL.</p>
+    <p>Error converting video. Try uploading the video instead</p>
   {/if}
 </div>
 
