@@ -21,6 +21,8 @@
   },
   "type": "module",
   "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.10",
+    "@ffmpeg/util": "^0.12.1",
     "@sveltejs/adapter-node": "^5.2.0"
   }
 }
