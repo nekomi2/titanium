@@ -5,5 +5,8 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	optimizeDeps: {
 		exclude: ['@ffmpeg/ffmpeg']
+	},
+	server: {
+		cors: true
 	}
 });
