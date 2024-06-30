@@ -1,5 +1,5 @@
 # Titanium
-Transcode videos to mp4 in your browser. Try it at [titanium.catgirls.rocks](titanium.catgirls.rocks)
+Transcode videos to mp4 in your browser. Try it at [titanium.catgirls.rocks](https://titanium.catgirls.rocks)
 
 Inspired by cobalt.tools
 
