@@ -75,7 +75,7 @@
   {#if !isValidVideoURL}
     <p>Not a valid video URL.</p>
   {:else}
-    <p>Valid video URL.</p>
+    <p>Valid video URL!</p>
   {/if}
   {#if state === "processing"}
     <p>Converting video...</p>
