@@ -17,7 +17,6 @@ async function getFileSize(url: string) : Promise<number> {
     fetch(url, { method: 'HEAD' })
       .then(response => {
         const contentLength = response.headers.get('content-length');
-        console.log(contentLength);
         if (contentLength) {
           resolve(parseInt(contentLength, 10));
         } else {

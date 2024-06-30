@@ -1,6 +1,6 @@
 <script lang="ts">
   import { FFmpeg } from "@ffmpeg/ffmpeg";
-  import { onMount, tick } from "svelte";
+  import { onMount } from "svelte";
   import { fetchFile, checkVideoURL } from "$lib/utils";
   let inputValue = "";
   let isValidVideoURL = false;
@@ -41,7 +41,7 @@
   }
 
   async function loadFFmpeg() {
-    const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm";
+    const baseURL = "/ffmpeg";
     ffmpeg = new FFmpeg();
     ffmpeg.on("log", ({ message }) => {
       console.log(message);
@@ -50,7 +50,6 @@
     await ffmpeg.load({
       coreURL: `${baseURL}/ffmpeg-core.js`,
       wasmURL: `${baseURL}/ffmpeg-core.wasm`,
-      workerURL: `${baseURL}/ffmpeg-core.worker.js`,
     });
     state = "loaded";
     console.log("FFmpeg loaded");
