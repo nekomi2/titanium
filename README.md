@@ -3,6 +3,8 @@ Transcode videos to mp4 in your browser
 
 Inspired by cobalt.tools
 
+![Example](docs/example.png)
+
 ## TODO
 - [ ] Rate limit
 - [ ] Add progress bar
