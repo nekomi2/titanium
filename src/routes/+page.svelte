@@ -134,9 +134,10 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+    margin: 1rem;
   }
   .url-input {
-    background: none;
+    background: none;  
     border: none;
     border-bottom: 1px solid gray;
     outline: none;
