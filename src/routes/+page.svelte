@@ -1,13 +1,39 @@
 <script lang="ts">
   import { FFmpeg } from "@ffmpeg/ffmpeg";
-  import { onMount } from "svelte";
-  import { fetchFile, checkVideoURL, getFormat } from "$lib/utils";
+  import { onMount, tick } from "svelte";
+  import { fetchFile, checkVideoURL, getFormat, isValidUrl } from "$lib/utils";
   let inputValue = "";
   let isValidVideoURL = false;
-  let state: "loading" | "loaded" | "processing" | "done" | "error" = "loading";
+  let state:
+    | "loading"
+    | "loaded"
+    | "processing"
+    | "done"
+    | "no_conversion"
+    | "error" = "loading";
   let ffmpeg: FFmpeg;
   let outputUrl: string;
+  let videoAnchor: HTMLAnchorElement;
   async function handleInput(event: any) {
+    if (!isValidUrl(inputValue)) {
+      isValidVideoURL = false;
+      return;
+    }
+    if (inputValue.endsWith(".mp4")) {
+      isValidVideoURL = true;
+      try {
+          const file = await fetch(inputValue)
+          const blob = await file.blob();
+          outputUrl = URL.createObjectURL(blob);
+          state = "no_conversion";
+          await tick();
+          videoAnchor.click();
+          return;
+        
+      } catch (error) {
+        state = "error";
+      }
+    }
     isValidVideoURL = checkVideoURL(inputValue);
     if (isValidVideoURL) {
       await convertToMp4(inputValue);
@@ -84,6 +110,11 @@
     <video src={outputUrl} controls>
       <track kind="captions" />
     </video>
+  {:else if state === "no_conversion"}
+    <a
+      bind:this={videoAnchor}
+      href={outputUrl}
+      download={outputUrl}>Downloading...</a>
   {:else if state === "error"}
     <p>Error converting video. Try uploading the video instead</p>
   {/if}
