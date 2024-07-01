@@ -22,14 +22,13 @@
     if (inputValue.endsWith(".mp4")) {
       isValidVideoURL = true;
       try {
-          const file = await fetch(inputValue)
-          const blob = await file.blob();
-          outputUrl = URL.createObjectURL(blob);
-          state = "no_conversion";
-          await tick();
-          videoAnchor.click();
-          return;
-        
+        const file = await fetch(inputValue);
+        const blob = await file.blob();
+        outputUrl = URL.createObjectURL(blob);
+        state = "no_conversion";
+        await tick();
+        videoAnchor.click();
+        return;
       } catch (error) {
         state = "error";
       }
@@ -96,9 +95,11 @@
     placeholder="Insert video link"
     bind:value={inputValue}
     on:input={handleInput}
+    disabled={state === 'loading'}
   />
-
-  {#if !isValidVideoURL}
+  {#if state === "loading"}
+    <p>Loading ffmpeg...</p>
+  {:else if !isValidVideoURL}
     <p>Not a valid video URL.</p>
   {:else}
     <p>Valid video URL!</p>
@@ -107,14 +108,20 @@
     <p>Converting video...</p>
   {:else if state === "done"}
     <p>Conversion complete!</p>
-    <video src={outputUrl} controls>
+    <video
+      style="
+    max-width: 300px;
+    max-height: 300px;
+    "
+      src={outputUrl}
+      controls
+    >
       <track kind="captions" />
     </video>
   {:else if state === "no_conversion"}
-    <a
-      bind:this={videoAnchor}
-      href={outputUrl}
-      download={outputUrl}>Downloading...</a>
+    <a bind:this={videoAnchor} href={outputUrl} download={outputUrl}
+      >Downloading...</a
+    >
   {:else if state === "error"}
     <p>Error converting video. Try uploading the video instead</p>
   {/if}

@@ -10,5 +10,3 @@ Inspired by cobalt.tools
 - [ ] Add progress bar
 - [ ] Send notification PWA
 - [ ] Add video upload
-- [ ] Fix video CSS
-- [ ] auto download when complete
