@@ -84,6 +84,15 @@
   onMount(async () => {
     await loadFFmpeg();
   });
+
+  const videoUrl =
+    "https://test-videos.co.uk/vids/bigbuckbunny/webm/vp9/1080/Big_Buck_Bunny_1080_10s_1MB.webm";
+
+  function copyToClipboard() {
+    navigator.clipboard.writeText(videoUrl).catch((err) => {
+      console.error("Failed to copy: ", err);
+    });
+  }
 </script>
 
 <div class="mainbox">
@@ -95,12 +104,18 @@
     placeholder="Insert video link"
     bind:value={inputValue}
     on:input={handleInput}
-    disabled={state === 'loading'}
+    disabled={state === "loading"}
   />
   {#if state === "loading"}
     <p>Loading ffmpeg...</p>
   {:else if !isValidVideoURL}
-    <p>Not a valid video URL.</p>
+    <p>
+      Not a valid video URL. To try, click to copy this link
+      <br />
+      <a href="#" on:click|preventDefault={copyToClipboard}>
+        "{videoUrl}"
+      </a>
+    </p>
   {:else}
     <p>Valid video URL!</p>
   {/if}
@@ -138,7 +153,7 @@
     margin: 1rem;
   }
   .url-input {
-    background: none;  
+    background: none;
     border: none;
     border-bottom: 1px solid gray;
     outline: none;
