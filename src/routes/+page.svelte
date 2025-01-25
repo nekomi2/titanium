@@ -46,14 +46,19 @@
       const inputFileName = `input.${format}`;
       const outputFileName = "output.mp4";
 
-      // Fetch the file and write it to FFmpeg's file system
       const data = await fetchFile(url);
       await ffmpeg.writeFile(inputFileName, data);
 
-      // Run FFmpeg command to convert WebM to MP4
-      await ffmpeg.exec(["-i", inputFileName, outputFileName]);
+      // Run FFmpeg command with hardware acceleration and optimized encoding
+      await ffmpeg.exec([
+        "-hwaccel", "auto",
+        "-i", inputFileName,
+        "-c:v", "h264",
+        "-preset", "ultrafast",
+        "-crf", "23",
+        outputFileName
+      ]);
 
-      // Read the output file
       const outputData = await ffmpeg.readFile(outputFileName);
       const outputBlob = new Blob([outputData], { type: "video/mp4" });
       outputUrl = URL.createObjectURL(outputBlob);
@@ -72,6 +77,11 @@
     ffmpeg.on("log", ({ message }) => {
       console.log(message);
     });
+    
+    // Add progress handler
+    ffmpeg.on("progress", ({ progress, time }) => {
+      console.log(`Progress: ${(progress * 100).toFixed(2)}%`);
+    });
 
     await ffmpeg.load({
       coreURL: `${baseURL}/ffmpeg-core.js`,
@@ -89,9 +99,7 @@
     "https://test-videos.co.uk/vids/bigbuckbunny/webm/vp9/1080/Big_Buck_Bunny_1080_10s_1MB.webm";
 
   function copyToClipboard() {
-    navigator.clipboard.writeText(videoUrl).catch((err) => {
-      console.error("Failed to copy: ", err);
-    });
+    navigator.clipboard.writeText(videoUrl);
   }
 </script>
 
@@ -162,3 +170,4 @@
     color: white;
   }
 </style>
+
