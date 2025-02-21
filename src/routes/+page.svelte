@@ -2,6 +2,7 @@
   import { FFmpeg } from "@ffmpeg/ffmpeg";
   import { onMount, tick } from "svelte";
   import { fetchFile, checkVideoURL, getFormat, isValidUrl } from "$lib/utils";
+  import Dropzone from './Dropzone.svelte';
   let inputValue = "";
   let isValidVideoURL = false;
   let state:
@@ -10,11 +11,22 @@
     | "processing"
     | "done"
     | "no_conversion"
-    | "error" = "loading";
+    | "error"
+    | "uploading" = "loading";
   let ffmpeg: FFmpeg;
   let outputUrl: string;
   let videoAnchor: HTMLAnchorElement;
+  let uploadedFile: File | null = null;
+
   async function handleInput(event: any) {
+    if (event.target.type === "file") {
+      uploadedFile = event.target.files[0];
+      if (uploadedFile) {
+        await convertToMp4(uploadedFile);
+      }
+      return;
+    }
+
     if (!isValidUrl(inputValue)) {
       isValidVideoURL = false;
       return;
@@ -39,18 +51,27 @@
     }
   }
 
-  async function convertToMp4(url: string) {
+  async function convertToMp4(input: string | File) {
     try {
       state = "processing";
-      const format = getFormat(url);
-      const inputFileName = `input.${format}`;
+      let inputFileName: string;
+      let data: Uint8Array;
+
+      if (typeof input === "string") {
+        const format = getFormat(input);
+        inputFileName = `input.${format}`;
+        data = await fetchFile(input);
+      } else {
+        inputFileName = input.name;
+        data = new Uint8Array(await input.arrayBuffer());
+      }
+
       const outputFileName = "output.mp4";
 
-      // Fetch the file and write it to FFmpeg's file system
-      const data = await fetchFile(url);
+      // Write the file to FFmpeg's file system
       await ffmpeg.writeFile(inputFileName, data);
 
-      // Run FFmpeg command to convert WebM to MP4
+      // Run FFmpeg command to convert to MP4
       await ffmpeg.exec(["-i", inputFileName, outputFileName]);
 
       // Read the output file
@@ -94,7 +115,6 @@
     });
   }
 </script>
-
 <div class="mainbox">
   <h1>Titanium</h1>
   <h2>Transcode videos in your browser</h2>
@@ -106,6 +126,16 @@
     on:input={handleInput}
     disabled={state === "loading"}
   />
+  <div class="dropzone">
+    <Dropzone
+      on:change={handleInput}
+      accept="video/*"
+      multiple={false}
+      disabled={state === "loading"}
+    >
+    </Dropzone>
+  </div>
+  
   {#if state === "loading"}
     <p>Loading ffmpeg...</p>
   {:else if !isValidVideoURL}
@@ -160,5 +190,9 @@
     font-size: 0.8rem;
     height: 2rem;
     color: white;
+  }
+  .dropzone {
+    border-radius: 4px;
+    margin: 1rem 0 2rem 0;
   }
 </style>

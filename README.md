@@ -11,4 +11,8 @@ Inspired by cobalt.tools
 - [ ] Rate limit
 - [ ] Add progress bar
 - [ ] Send notification PWA
-- [ ] Add video upload
+- [x] Add video upload
+
+## New Features
+
+- Added video upload feature: You can now upload a video file by clicking or pasting it into the upload field for transcoding.
